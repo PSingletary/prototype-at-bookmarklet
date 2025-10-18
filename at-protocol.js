@@ -14,52 +14,46 @@ class ATProtocolClient {
      * Authenticate user with AT Protocol
      */
     async authenticate() {
-        try {
-            // Check if we have cached session
-            const cached = this.getCache('user_session');
-            if (cached && cached.handle && cached.authenticated) {
-                return cached;
-            }
-
-            // Simple authentication - in a real implementation, this would be OAuth
-            // For now, we'll simulate with localStorage or prompt user
-            let identifier = localStorage.getItem('at_protocol_handle');
-            
-            if (!identifier || identifier.trim() === '') {
-                // Only prompt if we don't have a stored value and we're in a browser environment
-                if (typeof prompt !== 'undefined') {
-                    identifier = prompt('Enter your AT Protocol handle (e.g., username.bsky.social):');
-                } else {
-                    identifier = 'test.user.bsky.social'; // Fallback for testing
-                }
-            }
-            
-            if (!identifier || identifier.trim() === '') {
-                throw new Error('No identifier provided');
-            }
-
-            identifier = identifier.trim();
-
-            // Store for future use
-            try {
-                localStorage.setItem('at_protocol_handle', identifier);
-            } catch (storageError) {
-                console.warn('Could not store handle in localStorage:', storageError);
-            }
-
-            const session = {
-                handle: identifier,
-                authenticated: true,
-                timestamp: Date.now()
-            };
-
-            this.setCache('user_session', session);
-            return session;
-
-        } catch (error) {
-            console.error('Authentication failed:', error);
-            throw error;
+        // Check if we have cached session
+        const cached = this.getCache('user_session');
+        if (cached && cached.handle && cached.authenticated) {
+            return cached;
         }
+
+        // Simple authentication - in a real implementation, this would be OAuth
+        // For now, we'll simulate with localStorage or prompt user
+        let identifier = localStorage.getItem('at_protocol_handle');
+        
+        if (!identifier || identifier.trim() === '') {
+            // Only prompt if we don't have a stored value and we're in a browser environment
+            if (typeof prompt !== 'undefined') {
+                identifier = prompt('Enter your AT Protocol handle (e.g., username.bsky.social):');
+            } else {
+                identifier = 'test.user.bsky.social'; // Fallback for testing
+            }
+        }
+        
+        if (!identifier || identifier.trim() === '') {
+            throw new Error('No identifier provided');
+        }
+
+        identifier = identifier.trim();
+
+        // Store for future use
+        try {
+            localStorage.setItem('at_protocol_handle', identifier);
+        } catch (storageError) {
+            // Could not store handle in localStorage
+        }
+
+        const session = {
+            handle: identifier,
+            authenticated: true,
+            timestamp: Date.now()
+        };
+
+        this.setCache('user_session', session);
+        return session;
     }
 
     /**
@@ -97,7 +91,6 @@ class ATProtocolClient {
             return likesCount;
 
         } catch (error) {
-            console.error('Failed to get likes count:', error);
             // Fallback to default ammunition
             return 100;
         }
@@ -130,7 +123,6 @@ class ATProtocolClient {
             return lexicons;
 
         } catch (error) {
-            console.error('Failed to get lexicons:', error);
             // Fallback to basic lexicon
             return ['basic'];
         }
@@ -171,7 +163,7 @@ class ATProtocolClient {
             const newUsage = (isNaN(currentUsage) ? 0 : currentUsage) + 1;
             localStorage.setItem(key, newUsage.toString());
         } catch (error) {
-            console.error('Failed to record game session:', error);
+            // Failed to record game session - continue silently
         }
     }
 
@@ -235,7 +227,9 @@ class ATProtocolClient {
 
     getCache(key) {
         const cached = this.cache.get(key);
-        if (!cached) return null;
+        if (!cached) {
+            return null;
+        }
         
         if (Date.now() - cached.timestamp > this.cacheTimeout) {
             this.cache.delete(key);

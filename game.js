@@ -74,7 +74,6 @@ class SpaceInvadersGame {
             this.gameLoop();
             
         } catch (error) {
-            console.error('Game initialization failed:', error);
             this.showMessage('Failed to load game. Please refresh and try again.', 'error');
         }
     }
@@ -169,10 +168,9 @@ class SpaceInvadersGame {
      */
     gameLoop(currentTime = 0) {
         if (this.gameState === 'playing' || this.gameState === 'menu' || this.gameState === 'paused' || this.gameState === 'gameover') {
-            const deltaTime = currentTime - this.lastTime;
             this.lastTime = currentTime;
             
-            this.update(deltaTime);
+            this.update();
             this.render();
         }
         
@@ -184,7 +182,7 @@ class SpaceInvadersGame {
     /**
      * Update game state
      */
-    update(deltaTime) {
+    update() {
         // Only update game logic when playing
         if (this.gameState === 'playing') {
             // Update player
@@ -225,7 +223,7 @@ class SpaceInvadersGame {
         let changeDirection = false;
         
         // Check if any enemy hits the edge
-        for (let enemy of this.enemies) {
+        for (const enemy of this.enemies) {
             if (enemy.x <= 0 || enemy.x >= this.canvasWidth - enemy.width) {
                 changeDirection = true;
                 break;
@@ -233,7 +231,7 @@ class SpaceInvadersGame {
         }
         
         // Move enemies
-        for (let enemy of this.enemies) {
+        for (const enemy of this.enemies) {
             if (changeDirection) {
                 enemy.direction *= -1;
                 enemy.y += 20;
@@ -327,7 +325,7 @@ class SpaceInvadersGame {
         }
         
         // Check enemy-player collisions
-        for (let enemy of this.enemies) {
+        for (const enemy of this.enemies) {
             if (this.checkRectCollision(enemy, this.player)) {
                 this.gameOver();
                 break;
@@ -358,7 +356,7 @@ class SpaceInvadersGame {
         }
         
         // Check lose condition (enemies reach bottom)
-        for (let enemy of this.enemies) {
+        for (const enemy of this.enemies) {
             if (enemy.y >= this.canvasHeight - 100) {
                 this.gameOver();
                 break;
@@ -370,7 +368,9 @@ class SpaceInvadersGame {
      * Render the game
      */
     render() {
-        if (!this.ctx) return;
+        if (!this.ctx) {
+            return;
+        }
         
         // Clear canvas
         this.ctx.fillStyle = '#000';
@@ -412,7 +412,7 @@ class SpaceInvadersGame {
      * Render enemies
      */
     renderEnemies() {
-        for (let enemy of this.enemies) {
+        for (const enemy of this.enemies) {
             this.ctx.fillStyle = enemy.color;
             this.ctx.fillRect(enemy.x, enemy.y, enemy.width, enemy.height);
         }
@@ -423,13 +423,13 @@ class SpaceInvadersGame {
      */
     renderBullets() {
         // Player bullets
-        for (let bullet of this.bullets) {
+        for (const bullet of this.bullets) {
             this.ctx.fillStyle = bullet.color;
             this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
         }
         
         // Enemy bullets
-        for (let bullet of this.enemyBullets) {
+        for (const bullet of this.enemyBullets) {
             this.ctx.fillStyle = bullet.color;
             this.ctx.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
         }
@@ -558,7 +558,7 @@ class SpaceInvadersGame {
     /**
      * Show message to user
      */
-    showMessage(message, type = 'info') {
+    showMessage(message) {
         // Simple alert for now - could be enhanced with better UI
         alert(message);
     }

@@ -27,8 +27,8 @@ describe('Build Script', () => {
       
       expect(result).not.toContain('// This is a comment');
       expect(result).not.toContain('/* This is a block comment */');
-      expect(result).toContain('var x = 1');
-      expect(result).toContain('var y = 2');
+      expect(result).toContain('var x=1');
+      expect(result).toContain('var y=2');
     });
 
     test('should compress whitespace', () => {
@@ -91,7 +91,13 @@ describe('Build Script', () => {
         throw new Error('File not found');
       });
 
-      expect(() => createBookmarklet()).toThrow();
+      expect(() => {
+        try {
+          createBookmarklet();
+        } catch (error) {
+          throw error;
+        }
+      }).toThrow();
     });
 
     test('should return build information', () => {

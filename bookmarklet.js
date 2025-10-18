@@ -103,7 +103,6 @@
                 game = new SpaceInvadersGame();
                 
                 // Override the canvas creation to use our container
-                const originalCreateCanvas = game.createCanvas;
                 game.createCanvas = function() {
                     this.canvas = document.createElement('canvas');
                     this.canvas.width = this.canvasWidth;
@@ -144,14 +143,15 @@
             }
 
         } catch (error) {
-            console.error('Failed to load game:', error);
             showError('Failed to load the game. Please try again.');
         }
     }
 
     // Show error message
     function showError(message) {
-        if (!gameContainer) return;
+        if (!gameContainer) {
+            return;
+        }
 
         const errorDiv = document.createElement('div');
         errorDiv.style.cssText = `
@@ -200,14 +200,10 @@
     document.addEventListener('keydown', handleKeyPress);
 
     // Store reference for cleanup
-    let escapeHandler = handleKeyPress;
+    const escapeHandler = handleKeyPress;
 
     // Prevent conflicts with host page
     function preventConflicts() {
-        // Store original functions that might conflict
-        const originalAlert = window.alert;
-        const originalConsole = window.console;
-
         // Override global functions temporarily if needed
         // This is handled more gracefully in the actual implementation
     }

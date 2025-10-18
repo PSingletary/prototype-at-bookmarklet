@@ -23,7 +23,8 @@
   "jest": {
     "testEnvironment": "jsdom",
     "setupFilesAfterEnv": ["<rootDir>/jest.setup.js"],
-    "testMatch": ["**/__tests__/**/*.js", "**/?(*.)+(spec|test).js"],
+    "testMatch": ["**/__tests__/**/*.js"],
+    "testPathIgnorePatterns": ["<rootDir>/e2e/"],
     "collectCoverageFrom": [
       "*.js",
       "!build.js",

@@ -4,7 +4,6 @@
  */
 
 const fs = require('fs');
-const path = require('path');
 
 // Simple minifier (in production, use terser)
 function minifyJS(code) {
@@ -115,11 +114,7 @@ function createBookmarklet() {
         
         fs.writeFileSync('./bookmarklet.html', bookmarkletHTML);
         
-        console.log('✅ Bookmarklet built successfully!');
-        console.log(`📦 Minified size: ${(minifiedCode.length / 1024).toFixed(2)} KB`);
-        console.log('📁 Files created:');
-        console.log('   - bookmarklet.min.js (minified code)');
-        console.log('   - bookmarklet.html (installation page)');
+        // Build completed successfully
         
         return {
             code: minifiedCode,
@@ -128,14 +123,19 @@ function createBookmarklet() {
         };
         
     } catch (error) {
-        console.error('❌ Build failed:', error.message);
-        process.exit(1);
+        throw new Error(`Build failed: ${error.message}`);
     }
 }
 
 // Run the build
 if (require.main === module) {
-    createBookmarklet();
+    try {
+        createBookmarklet();
+    } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Build failed:', error.message);
+        process.exit(1);
+    }
 }
 
 module.exports = { createBookmarklet, minifyJS };

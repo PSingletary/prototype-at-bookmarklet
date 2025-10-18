@@ -131,8 +131,9 @@ describe('SpaceInvadersGame', () => {
     test('should set correct colors for different rows', () => {
       game.initEnemies();
       
-      expect(game.enemies[0].color).toBe('#ff0000'); // First row
-      expect(game.enemies[20].color).toBe('#ffff00'); // Last row
+      expect(game.enemies[0].color).toBe('#ff0000'); // First row (row 0)
+      expect(game.enemies[20].color).toBe('#ff8800'); // Middle row (row 2)
+      expect(game.enemies[40].color).toBe('#ffff00'); // Last row (row 4)
     });
   });
 
@@ -214,7 +215,7 @@ describe('SpaceInvadersGame', () => {
 
   describe('updatePlayer', () => {
     beforeEach(() => {
-      game.player = { x: 400, y: 500, speed: 5 };
+      game.player = { x: 400, y: 500, width: 50, speed: 5 };
       game.canvasWidth = 800;
     });
 
