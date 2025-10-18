@@ -19,7 +19,7 @@ module.exports = defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'http://localhost:8080',
+    baseURL: process.env.CI ? 'http://localhost:8080' : 'http://127.0.0.1:8000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
@@ -54,9 +54,9 @@ module.exports = defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'python3 -m http.server 8080',
-    url: 'http://localhost:8080',
-    reuseExistingServer: !process.env.CI,
+  webServer: process.env.CI ? undefined : {
+    command: 'python3 -m http.server 8000',
+    url: 'http://127.0.0.1:8000',
+    reuseExistingServer: true,
   },
 });
