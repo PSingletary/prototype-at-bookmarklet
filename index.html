@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AT Protocol Space Invaders - Development</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #1a1a1a;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #00ff00;
+        }
+        
+        .game-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .info {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .bookmarklet-link {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px;
+        }
+        
+        .bookmarklet-link:hover {
+            background: #0052a3;
+        }
+        
+        .controls {
+            background: #444;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AT Protocol Space Invaders</h1>
+        
+        <div class="info">
+            <h2>Development Environment</h2>
+            <p>This page loads the game directly for development and testing.</p>
+            <p><strong>AT Protocol Integration:</strong> Uses simulated data for testing.</p>
+            <p><strong>Game Mechanics:</strong> Ammunition based on user likes, multipliers based on lexicon diversity.</p>
+        </div>
+
+        <div class="controls">
+            <h3>Controls:</h3>
+            <ul>
+                <li><strong>Arrow Keys:</strong> Move player left/right</li>
+                <li><strong>Spacebar:</strong> Shoot</li>
+                <li><strong>P:</strong> Pause game</li>
+                <li><strong>Enter:</strong> Start game (from menu)</li>
+            </ul>
+        </div>
+
+        <div class="game-container">
+            <!-- Game will be loaded here by JavaScript -->
+        </div>
+
+        <div class="info">
+            <h3>Bookmarklet Installation</h3>
+            <p>Drag this link to your bookmarks bar to play the game on any website:</p>
+            <a href="javascript:(function(){var script=document.createElement('script');script.src='./bookmarklet.js';document.head.appendChild(script);})();" class="bookmarklet-link">
+                🚀 Space Invaders
+            </a>
+        </div>
+
+        <div class="info">
+            <h3>How It Works</h3>
+            <ol>
+                <li><strong>Authentication:</strong> Game prompts for AT Protocol handle</li>
+                <li><strong>Data Loading:</strong> Fetches user's likes count and lexicon data</li>
+                <li><strong>Ammunition:</strong> Total likes become available shots</li>
+                <li><strong>Multipliers:</strong> Different lexicons increase score multipliers</li>
+                <li><strong>Daily Limits:</strong> Prevents abuse with usage tracking</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Load game scripts -->
+    <script src="at-protocol.js"></script>
+    <script src="game.js"></script>
+    
+    <script>
+        // Initialize game when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const gameContainer = document.querySelector('.game-container');
+            
+            // Create and start the game
+            const game = new SpaceInvadersGame();
+            
+            // Initialize and let it create its own canvas
+            game.init().then(() => {
+                console.log('Game initialized successfully');
+            }).catch((error) => {
+                console.error('Game initialization failed:', error);
+                if (gameContainer) {
+                    gameContainer.innerHTML = '<p style="color: #ff4444;">Failed to initialize game. Check console for details.</p>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

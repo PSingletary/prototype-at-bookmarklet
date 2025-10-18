@@ -1,0 +1,128 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Run linter
+      run: npm run lint
+      
+    - name: Run tests
+      run: npm run test:coverage
+      
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: matrix.node-version == '20.x'
+      with:
+        file: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build bookmarklet
+      run: npm run build
+      
+    - name: Test build output
+      run: |
+        if [ ! -f "bookmarklet.min.js" ]; then
+          echo "Build failed: bookmarklet.min.js not created"
+          exit 1
+        fi
+        if [ ! -f "bookmarklet.html" ]; then
+          echo "Build failed: bookmarklet.html not created"
+          exit 1
+        fi
+        
+        # Check file size is reasonable (under 2MB)
+        SIZE=$(wc -c < bookmarklet.min.js)
+        if [ $SIZE -gt 2097152 ]; then
+          echo "Build failed: bookmarklet.js is too large ($SIZE bytes)"
+          exit 1
+        fi
+        
+        echo "Build output size: $SIZE bytes"
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: bookmarklet-build
+        path: |
+          bookmarklet.min.js
+          bookmarklet.html
+
+  browser-test:
+    runs-on: ubuntu-latest
+    needs: build
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Download build artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: bookmarklet-build
+        
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: Install Playwright
+      run: npx playwright install ${{ matrix.browser }}
+      
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Start local server
+      run: |
+        python3 -m http.server 8080 &
+        sleep 3
+        
+    - name: Run browser tests
+      run: npx playwright test --project=${{ matrix.browser }}
+      continue-on-error: true
